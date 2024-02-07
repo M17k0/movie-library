@@ -6,11 +6,9 @@ from .setup import db
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(128), unique=True)
-    password_hash = db.Column(db.String(64))
-    password_salt = db.Column(db.String(8))
+    password = db.Column(db.String(64))
 
     watched_movies = db.relationship("Watched")
-    reviews = db.relationship("Review")
     watchlist = db.relationship("Watchlist")
 
 class Movie(db.Model):

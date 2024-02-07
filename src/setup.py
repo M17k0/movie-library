@@ -25,7 +25,7 @@ def create_app() -> Flask:
 
     return app
 
-def create_database(app):
+def create_database(app: Flask) -> None:
     db_path = path.join("..", "instance", DB_NAME)
     if not path.exists(db_path):
         with app.app_context():

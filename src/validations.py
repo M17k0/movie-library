@@ -1,10 +1,11 @@
 import re
+from werkzeug.security import check_password_hash
 
 from flask import request, flash
 
 regex = re.compile(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
-def validate_sign_up(user) -> bool:
+def is_sig_up_info_valid(user) -> bool:
     if user:
         flash(f"Email: {user.email} already in use. Please log in.", category="error")
         return False
@@ -27,5 +28,14 @@ def validate_sign_up(user) -> bool:
     
     return True
     
-def validate_login() -> bool:
-    ...
+def is_login_info_valid(user) -> bool:
+        if user:
+            password = request.form.get("password") or ""
+            if check_password_hash(user.password, password):
+                return True 
+            else:
+                flash("Email and password do not match. Try again.", category="error")
+        else:
+            flash("No user with this email. Sign up.", category="error")
+            
+        return False

@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
 
-from .validations import validate_sign_up
+from .validations import is_sig_up_info_valid, is_login_info_valid
 
 auth = Blueprint("auth", __name__, template_folder="../templates")
 
@@ -12,18 +12,12 @@ def login():
 
     if request.method == "POST":
         email = request.form.get("email")
-        password = request.form.get("password") or ""
 
         user = User.query.filter_by(email=email).first()
-        if user:
-            if check_password_hash(user.password, password):
-                flash("Logged in successfully.", category="success")
+        if is_login_info_valid(user):
                 login_user(user, remember=True)
+                flash("Logged in successfully.", category="success")
                 return redirect(url_for("views.home"))
-            else:
-                flash("Email and password do not match. Try again.", category="error")
-        else:
-            flash("No user with this email. Sign up.", category="error")
 
     return render_template("login.html", user=current_user)
 
@@ -39,10 +33,9 @@ def sign_up():
 
     if request.method == "POST":
         data = request.form
-        if not validate_sign_up(User.query.filter_by(email=data.get('email')).first()):
+        if not is_sig_up_info_valid(User.query.filter_by(email=data.get('email')).first()):
             return render_template("sign_up.html")
 
-        # everything is valid
         email = request.form.get("email")
         password = request.form.get("password1") or ""
         password_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Watchlist{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Watchlist</h1>
+  <div class="row">
+    <div class="col">
+      <ul class="list-group">
+        {% for movie in watchlist %}
+        <li class="list-group-item">{{ movie.title }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

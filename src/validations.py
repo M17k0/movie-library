@@ -5,7 +5,7 @@ from flask import request, flash
 
 regex = re.compile(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
-def is_sig_up_info_valid(user) -> bool:
+def is_sign_up_info_valid(user) -> bool:
     if user:
         flash(f"Email: {user.email} already in use. Please log in.", category="error")
         return False
@@ -37,5 +37,5 @@ def is_login_info_valid(user) -> bool:
                 flash("Email and password do not match. Try again.", category="error")
         else:
             flash("No user with this email. Sign up.", category="error")
-            
+
         return False

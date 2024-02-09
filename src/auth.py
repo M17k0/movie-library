@@ -3,7 +3,6 @@ from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
 
 from .validations import is_sign_up_info_valid, is_login_info_valid
-from . import setup 
 
 auth = Blueprint("auth", __name__, template_folder="../templates")
 
@@ -35,7 +34,7 @@ def sign_up():
     if request.method == "POST":
         data = request.form
         if not is_sign_up_info_valid(User.query.filter_by(email=data.get('email')).first()):
-            return render_template("sign_up.html")
+            return render_template("sign_up.html", user=current_user)
 
         email = request.form.get("email")
         password = request.form.get("password1") or ""
@@ -45,11 +44,11 @@ def sign_up():
         new_user.email = email
         new_user.password = password_hash
 
-        # from setup import db # if theres no from . import setup on top
+        from setup import db
 
         login_user(new_user, remember=True)
-        setup.db.session.add(new_user)
-        setup.db.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
 
         flash("Account created successfully!", category="success")
         return redirect(url_for("views.home"))

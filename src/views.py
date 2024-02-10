@@ -30,4 +30,5 @@ def home():
         if movie_title:
             search_results = search_movie(movie_title)
             return render_template("home.html", user=current_user, search_results=search_results)
+        
     return render_template("home.html", user=current_user)

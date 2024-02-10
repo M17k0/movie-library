@@ -1,8 +1,14 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+@dataclass
+class GenreModel:
+    id: int
+    name: str
 
 @dataclass
 class MovieModel:
     id: int
     title: str
     poster: str
-
+    relese_date: str
+    genres: list[GenreModel] = field(default_factory=list)

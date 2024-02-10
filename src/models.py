@@ -31,6 +31,9 @@ class MovieGenre(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey("movie.id"), primary_key=True)
     genre_id = db.Column(db.Integer, db.ForeignKey("genre.id"), primary_key=True)
 
+    movie = db.relationship("Movie", primaryjoin='MovieGenre.movie_id==Movie.id', uselist=True)
+    genre = db.relationship("Genre", primaryjoin='MovieGenre.genre_id==Genre.id', uselist=True)
+
 class Watched(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))

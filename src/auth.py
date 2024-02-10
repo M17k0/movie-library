@@ -44,7 +44,7 @@ def sign_up():
         new_user.email = email
         new_user.password = password_hash
 
-        from setup import db
+        from .setup import db
 
         login_user(new_user, remember=True)
         db.session.add(new_user)

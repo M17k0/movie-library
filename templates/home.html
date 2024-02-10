@@ -26,7 +26,6 @@
     </div>
   </div>
 
-  <!-- Display search results -->
   <div class="row mt-4">
     {% if search_results %}
       {% for movie in search_results %}
@@ -36,9 +35,9 @@
             <div class="card-body">
               <h5 class="card-title">{{ movie.title }}</h5>
               <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary">Log</button>
+                <a class="btn btn-primary" href="/log/{{ movie.id }}">Log</a>
                 <span style="margin: 0 30px;"></span>
-                <button type="button" class="btn btn-primary">Add to Watchlist</button>
+                <a class="btn btn-primary ml-2" href="/add-to-watchlist/{{ movie.id }}">Add to watchlist</a>
               </div>
             </div>
           </div>

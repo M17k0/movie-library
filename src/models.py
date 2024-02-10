@@ -42,6 +42,8 @@ class Watched(db.Model):
     review = db.Column(db.Text)
     date_watched = db.Column(db.DateTime, default=func.now())
 
+    movie = db.relationship("Movie", backref=db.backref("movie", uselist=False))
+    
 class Watchlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))

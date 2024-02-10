@@ -5,7 +5,7 @@ import requests
 from urllib.parse import quote
 from typing import Optional
 
-from tmdb_models.movie_model import MovieModel, GenreModel
+from .tmdb_models.movie_model import MovieModel, GenreModel
 
 tmdb_base_url =  "https://api.themoviedb.org/3/"
 tmdd_poster_url = "https://image.tmdb.org/t/p/w185/"
@@ -33,8 +33,8 @@ def search_movie(name, page=1) -> list[MovieModel]:
     data = response.json()
     movies = [MovieModel(id=movie["id"],
                          title=movie["title"],
-                         poster="https://image.tmdb.org/t/p/w185/" + movie["poster_path"],
-                         relese_date=movie["release_date"])
+                         poster=tmdd_poster_url + movie["poster_path"],
+                         release_date=movie["release_date"])
               for movie in data["results"] 
               if movie["poster_path"] != None]
 
@@ -55,7 +55,7 @@ def get_movie_by_id(moie_id: int):
     movie = MovieModel(id=data["id"],
                        title=data["original_title"],
                        poster=tmdd_poster_url + data["poster_path"],
-                       relese_date=data["release_date"])
+                       release_date=data["release_date"])
     
     movie.genres = [GenreModel(id=genre["id"],
                                name=genre["name"])

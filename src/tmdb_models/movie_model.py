@@ -10,5 +10,5 @@ class MovieModel:
     id: int
     title: str
     poster: str
-    relese_date: str
+    release_date: str
     genres: list[GenreModel] = field(default_factory=list)

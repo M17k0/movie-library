@@ -1,15 +1,12 @@
-from flask import Blueprint, render_template, current_app
+from flask import Blueprint, render_template, current_app, request
 import os
 from flask_login import current_user, login_required
 
-views = Blueprint("views", __name__, template_folder="../templates/")
+from .tmdb_interface import search_movie
+from .setup import db
+from .models import User, Watched, Watchlist
 
-# @views.route("/", methods=["GET", "POST"])
-# def main_route():
-#     if current_user.is_authenticated:
-#          return render_template("home.html", user=current_user)
-#     else:
-#          return render_template("login.html", user=current_user)
+views = Blueprint("views", __name__, template_folder="../templates/")
 
 @views.route('/watched')
 def watched():
@@ -25,7 +22,12 @@ def watchlist():
     watchlist = Watchlist.query.all()
     return render_template('watchlist.html', user=current_user, watched_movies=watchlist)
 
-@views.route('/')
+@views.route('/', methods=["GET", "POST"])
 @login_required
 def home():
+    if request.method == "POST":
+        movie_title = request.form.get("movie_title")
+        if movie_title:
+            search_results = search_movie(movie_title)
+            return render_template("home.html", user=current_user, search_results=search_results)
     return render_template("home.html", user=current_user)

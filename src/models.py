@@ -15,6 +15,7 @@ class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tmdb_id = db.Column(db.Integer)
     title = db.Column(db.String(256))
+    poster = db.Column(db.String(128))
     release_date = db.Column(db.DateTime)
 
     movie_genres = db.relationship("MovieGenre")

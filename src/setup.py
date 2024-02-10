@@ -3,9 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 
-from .views import views
-from .auth import auth
-
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
@@ -16,6 +13,9 @@ def create_app() -> Flask:
     db.init_app(app)
 
     app.template_folder = 'templates'
+
+    from .views import views
+    from .auth import auth
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')

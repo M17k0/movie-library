@@ -8,8 +8,23 @@
   <div class="row">
     <div class="col">
       <ul class="list-group">
-        {% for movie in watched_movies %}
-        <li class="list-group-item">{{ movie.title }} - Rated: {{ movie.rating }}</li>
+        {% for watched_movie in watched_movies %}
+        <li class="list-group-item position-relative">
+          <form action="/remove-log/{{ watched_movie.id }}" method="post">
+            <button type="submit" class="btn btn-danger" style="position: absolute; top: 10px; right: 10px;">
+              <span class="fa fa-trash"></span>
+            </button>
+          </form>
+          <div class="d-flex align-items-center">
+            <img src="{{ watched_movie.movie.poster }}" alt="{{ watched_movie.movie.title }}" class="mr-3" style="max-width: 100px;">
+            <div>
+              <h5>{{ watched_movie.movie.title }}</h5>
+              <p>Rated: {{ watched_movie.rating }}</p>
+              <p>Date Watched: {{ watched_movie.date_watched.strftime("%Y-%m-%d") }}</p>
+              <p>Review: {{ watched_movie.review }}</p>
+            </div>
+          </div>
+        </li>
         {% endfor %}
       </ul>
     </div>

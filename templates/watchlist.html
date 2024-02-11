@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Watchlist{% endblock %}
+{% block title %}Watched Movies{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -8,8 +8,20 @@
   <div class="row">
     <div class="col">
       <ul class="list-group">
-        {% for movie in watchlist %}
-        <li class="list-group-item">{{ movie.title }}</li>
+        {% for wathchlist_item in watchlist %}
+        <li class="list-group-item position-relative">
+          <form action="/remove-log/{{ wathchlist_item.id }}" method="post">
+            <button type="submit" class="btn btn-danger" style="position: absolute; top: 10px; right: 10px;">
+              <span class="fa fa-trash"></span>
+            </button>
+          </form>
+          <div class="d-flex align-items-center">
+            <img src="{{ wathchlist_item.movie.poster }}" alt="{{ wathchlist_item.movie.title }}" class="mr-3" style="max-width: 100px;">
+            <div>
+              <h5>{{ wathchlist_item.movie.title }}</h5>
+            </div>
+          </div>
+        </li>
         {% endfor %}
       </ul>
     </div>

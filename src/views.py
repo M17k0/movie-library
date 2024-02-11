@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, request, redirect, url_for
+from flask import Blueprint, render_template, current_app, request, redirect, url_for, abort, flash
 import os
 from flask_login import current_user, login_required
 from datetime import datetime
@@ -9,19 +9,18 @@ from .models import User, Watched, Watchlist, Genre, Movie, MovieGenre
 
 views = Blueprint("views", __name__, template_folder="../templates/")
 
-@views.route('/watched')
+@views.route("/watched", methods=["GET"])
+@login_required
 def watched():
-    from .models import Watched
-
-    watched_movies = Watched.query.all()
-    return render_template('watched.html', user=current_user, watched_movies=watched_movies)
+    watched_movies = Watched.query.filter_by(user_id=current_user.id).order_by(Watched.date_watched.desc()).all()
+    return render_template("watched.html", user=current_user, watched_movies=watched_movies)
 
 @views.route('/watchlist')
 def watchlist():
     from .models import Watchlist
 
-    watchlist = Watchlist.query.all()
-    return render_template('watchlist.html', user=current_user, watched_movies=watchlist)
+    watchlist = Watchlist.query.filter_by(user_id=current_user.id).order_by(Watchlist.id.desc()).all()
+    return render_template('watchlist.html', user=current_user, watchlist=watchlist)
 
 @views.route('/', methods=["GET", "POST"])
 @login_required
@@ -68,7 +67,6 @@ def log(id):
                 movie_genre.genre_id = genre.id
                 db.session.add(movie_genre)
                 db.session.flush()
-            
                 
         db_watched = Watched()
         db_watched.user_id = current_user.id
@@ -85,3 +83,70 @@ def log(id):
     
     movie = get_movie_by_id(id)
     return render_template("log.html", user=current_user, movie=movie)
+
+@views.route("/remove-log/<id>", methods=["POST"])
+@login_required
+def remove_log(id):
+    movie = Watched.query.filter_by(id=id).first()
+    
+    if not movie:
+        abort(400)
+    
+    db.session.delete(movie)
+    db.session.commit()
+    
+    return redirect(url_for("views.watched"))
+
+@views.route("/add-to-watchlist/<id>", methods=["POST"])
+@login_required
+def add_to_watchlist(id):
+    movie = get_movie_by_id(id)
+        
+    db_genres = []
+    for genre in movie.genres:
+        db_genre = Genre.query.filter_by(tmdb_id=genre.id).first()
+        if not db_genre:
+            db_genre = Genre()
+            db_genre.tmdb_id = genre.id
+            db_genre.name = genre.name
+            db.session.add(db_genre)
+            db.session.flush()
+        db_genres.append(db_genre)
+    
+    db_movie = Movie.query.filter_by(tmdb_id=movie.id).first()
+    if not db_movie:
+        db_movie = Movie()
+        db_movie.tmdb_id = movie.id
+        db_movie.title = movie.title
+        db_movie.poster = movie.poster
+        release_date = datetime.strptime(movie.release_date, "%Y-%m-%d") 
+        db_movie.release_date = release_date
+        db.session.add(db_movie)
+        db.session.flush()
+        
+        for genre in db_genres:
+            movie_genre = MovieGenre()
+            movie_genre.movie_id = db_movie.id
+            movie_genre.genre_id = genre.id
+            db.session.add(movie_genre)
+            db.session.flush()
+    
+    db_watched = Watched.query.filter_by(movie_id=db_movie.id).first()    
+    if db_watched:
+        flash("Movie already watched!", category="error")
+        return redirect(url_for("views.home"))
+    
+    db_watchlist = Watchlist.query.filter_by(movie_id=db_movie.id).first()
+    if db_watchlist:
+        flash("Movie already in watchlist!", category="error")
+        return redirect(url_for("views.home"))
+    
+    db_watchlist = Watchlist()
+    db_watchlist.user_id = current_user.id
+    db_watchlist.movie_id = db_movie.id
+    
+    db.session.add(db_watchlist)
+    db.session.commit()
+    
+    return redirect(url_for("views.watchlist"))
+        

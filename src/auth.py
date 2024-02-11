@@ -16,7 +16,9 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
 
-        user = User.query.filter_by(email=email).first()
+        user = (User.query
+                .filter_by(email=email)
+                .first())
         if is_login_info_valid(user):
                 login_user(user, remember=True)
                 flash("Logged in successfully.", category="success")
@@ -36,12 +38,16 @@ def sign_up():
 
     if request.method == "POST":
         data = request.form
-        if not is_sign_up_info_valid(User.query.filter_by(email=data.get('email')).first()):
+        if not is_sign_up_info_valid((User.query
+                                      .filter_by(email=data.get('email'))
+                                      .first())):
             return render_template("sign_up.html", user=current_user)
 
         email = request.form.get("email")
         password = request.form.get("password1") or ""
-        password_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
+        password_hash = generate_password_hash(password,
+                                               method='pbkdf2:sha256',
+                                               salt_length=16)
 
         new_user = User()
         new_user.email = email

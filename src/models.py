@@ -1,5 +1,5 @@
 """
-Create sqlalchemy database models
+Create SQLAlchemy database models
 """
 from flask_login import UserMixin
 from sqlalchemy.sql import func

@@ -1,5 +1,5 @@
 """
-Implements the integration with the tmdb API
+Implements the integration with the TMDB API
 """
 import dotenv
 import os

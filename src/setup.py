@@ -15,7 +15,7 @@ def create_app() -> Flask:
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_NAME}"
     db.init_app(app)
 
-    app.template_folder = 'templates'
+    app.template_folder = "templates"
 
     from .views import views
     from .auth import auth

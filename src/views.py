@@ -1,8 +1,8 @@
 """
-Handles routes for
+Handles routes for logging watched movies, managing watchlists,
+discovering movies by genre, and finding similar movies using the TMDB API.
 """
 from flask import Blueprint, render_template, current_app, request, redirect, url_for, abort, flash
-import os
 from flask_login import current_user, login_required
 from datetime import datetime
 
@@ -24,7 +24,7 @@ def watched():
                            user=current_user,
                            watched_movies=watched_movies)
 
-@views.route('/watchlist')
+@views.route("/watchlist")
 def watchlist():
     from .models import Watchlist
 
@@ -33,11 +33,11 @@ def watchlist():
                  .order_by(Watchlist.id.desc())
                  .all())
     
-    return render_template('watchlist.html',
+    return render_template("watchlist.html",
                            user=current_user,
                            watchlist=watchlist)
 
-@views.route('/', methods=["GET", "POST"])
+@views.route("/", methods=["GET", "POST"])
 @login_required
 def home():
     if request.method == "POST":

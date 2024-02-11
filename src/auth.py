@@ -26,11 +26,11 @@ def login():
 
     return render_template("login.html", user=current_user)
 
-@auth.route('/logout')
+@auth.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for("auth.login"))
 
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
@@ -39,14 +39,14 @@ def sign_up():
     if request.method == "POST":
         data = request.form
         if not is_sign_up_info_valid((User.query
-                                      .filter_by(email=data.get('email'))
+                                      .filter_by(email=data.get("email"))
                                       .first())):
             return render_template("sign_up.html", user=current_user)
 
         email = request.form.get("email")
         password = request.form.get("password1") or ""
         password_hash = generate_password_hash(password,
-                                               method='pbkdf2:sha256',
+                                               method="pbkdf2:sha256",
                                                salt_length=16)
 
         new_user = User()

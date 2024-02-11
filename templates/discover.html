@@ -20,7 +20,7 @@
                 <option value="" selected disabled>Select Genre</option>
             {% endif %}
             {% for genre in genres %}
-                {% if selected_genre_id|int == genre.id %}
+                {% if selected_genre_id and selected_genre_id|int == genre.id %}
                     <option value="{{ genre.id }}" selected>{{ genre.name }}</option>
                 {% else %}
                     <option value="{{ genre.id }}">{{ genre.name }}</option>

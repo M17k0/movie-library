@@ -4,32 +4,34 @@
 
 {% block content %}
 
-<form method="post">
-    <h3 align="centre">Login</h3>
-    <div class="form-group">
-        <label for="email">Email address</label>
-        <input 
-        type="email" 
-        class="form-control" 
-        id="email" 
-        name="email" 
-        placeholder="Enter email"
-        />
-    </div>
+<div class="d-flex justify-content-center">
+    <form method="post" style="max-width: 800px; flex-grow: 1;">
+        <h3 align="center">Login</h3>
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            name="email" 
+            placeholder="Enter email"
+            />
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            name="password" 
+            placeholder="Enter password"
+            />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Login</button>
     
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input 
-        type="password" 
-        class="form-control" 
-        id="password" 
-        name="password" 
-        placeholder="Enter password"
-        />
-    </div>
-    <br />
-    <button type="submit" class="btn btn-primary">Login</button>
-
-</form>
+    </form>
+</div>
 
 {% endblock %}

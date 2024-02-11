@@ -3,7 +3,7 @@ import os
 from flask_login import current_user, login_required
 from datetime import datetime
 
-from .tmdb_interface import search_movie, get_movie_by_id
+from .tmdb_interface import search_movie, get_movie_by_id, get_tmdb_genres, get_movies_by_genre, get_reccomendations
 from .setup import db
 from .models import User, Watched, Watchlist, Genre, Movie, MovieGenre
 
@@ -79,7 +79,7 @@ def log(id):
         db.session.add(db_watched)
         db.session.commit()
         
-        return redirect(url_for("views.home"))
+        return redirect(url_for("views.watched"))
     
     movie = get_movie_by_id(id)
     return render_template("log.html", user=current_user, movie=movie)
@@ -87,12 +87,12 @@ def log(id):
 @views.route("/remove-log/<id>", methods=["POST"])
 @login_required
 def remove_log(id):
-    movie = Watched.query.filter_by(id=id).first()
+    db_watched = Watched.query.filter_by(id=id).first()
     
-    if not movie:
+    if not db_watched:
         abort(400)
     
-    db.session.delete(movie)
+    db.session.delete(db_watched)
     db.session.commit()
     
     return redirect(url_for("views.watched"))
@@ -149,4 +149,36 @@ def add_to_watchlist(id):
     db.session.commit()
     
     return redirect(url_for("views.watchlist"))
+      
+@views.route("/remove-watchlist/<id>", methods=["POST"])
+@login_required
+def remove_watchlsit(id):
+    db_watchlist = Watchlist.query.filter_by(id=id).first()
+    
+    if not db_watchlist:
+        abort(400)
+    
+    db.session.delete(db_watchlist)
+    db.session.commit()
+    
+    return redirect(url_for("views.watchlist"))  
+
+@views.route("/discover", methods=["GET", "POST"])
+@login_required
+def discover():
+    genres = get_tmdb_genres()
+    
+    if request.method == "POST":
+        genre_id = (request.form.get("genre_id") or "0")
+        movies = get_movies_by_genre(int(genre_id))
         
+        return render_template("discover.html", user=current_user, genres=genres, selected_genre_id=genre_id, discover_results=movies)
+    
+    return render_template("discover.html", user=current_user, genres=genres)
+
+@views.route("/similar/<id>")
+@login_required
+def similar(id):
+    similar_movies = get_reccomendations(id)
+    return render_template("similar.html", user=current_user, similar_movies=similar_movies)
+    

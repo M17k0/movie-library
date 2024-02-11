@@ -1,28 +1,11 @@
 {% extends "base.html" %}
-
 {% block title %}Home{% endblock %}
 
 {% block content %}
 <div class="container">
   <div class="row mt-4">
-    <div class="col-sm">
-      <h1>Welcome, {{ user.email }}</h1>
-    </div>
-  </div>
-  <div class="row mt-3">
-    <div class="col">
-      <form action="/" method="POST" class="form-inline">
-        <div class="form-group mr-2">
-          <input type="text" class="form-control" name="movie_title" placeholder="Search for a movie">
-        </div>
-        <button type="submit" class="btn btn-primary">Search</button>
-      </form>
-    </div>
-  </div>
-
-  <div class="row mt-4">
-    {% if search_results %}
-      {% for movie in search_results %}
+    {% if similar_movies %}
+      {% for movie in similar_movies %}
         <div class="col-md-4 mb-4">
           <div class="card">
             <img src="{{ movie.poster }}" class="card-img-top" alt="{{ movie.title }}">

@@ -1,28 +1,41 @@
 {% extends "base.html" %}
-
-{% block title %}Home{% endblock %}
+{% block title %}Discover{% endblock %}
 
 {% block content %}
 <div class="container">
   <div class="row mt-4">
-    <div class="col-sm">
-      <h1>Welcome, {{ user.email }}</h1>
+    <div class="col">
+      <h1>Discover Movies</h1>
     </div>
   </div>
-  <div class="row mt-3">
+
+  <div class="row mt-4">
     <div class="col">
-      <form action="/" method="POST" class="form-inline">
+      <form action="/discover" method="POST" class="form-inline">
         <div class="form-group mr-2">
-          <input type="text" class="form-control" name="movie_title" placeholder="Search for a movie">
+          <select class="form-control" name="genre_id" required>
+            {% if selected_genre_id %}
+                <option value="" disabled>Select Genre</option>
+            {% else %}
+                <option value="" selected disabled>Select Genre</option>
+            {% endif %}
+            {% for genre in genres %}
+                {% if selected_genre_id|int == genre.id %}
+                    <option value="{{ genre.id }}" selected>{{ genre.name }}</option>
+                {% else %}
+                    <option value="{{ genre.id }}">{{ genre.name }}</option>
+                {% endif %}
+            {% endfor %}
+          </select>
         </div>
-        <button type="submit" class="btn btn-primary">Search</button>
+        <button type="submit" class="btn btn-primary">Discover</button>
       </form>
     </div>
   </div>
 
   <div class="row mt-4">
-    {% if search_results %}
-      {% for movie in search_results %}
+    {% if discover_results %}
+      {% for movie in discover_results %}
         <div class="col-md-4 mb-4">
           <div class="card">
             <img src="{{ movie.poster }}" class="card-img-top" alt="{{ movie.title }}">

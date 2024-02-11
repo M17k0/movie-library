@@ -1,3 +1,6 @@
+"""
+Handles routes for movie library features
+"""
 from flask import Blueprint, render_template, current_app, request, redirect, url_for, abort, flash
 import os
 from flask_login import current_user, login_required

@@ -1,3 +1,6 @@
+"""
+Common validations for authentication
+"""
 import re
 from werkzeug.security import check_password_hash
 

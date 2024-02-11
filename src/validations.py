@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash
 
 from flask import request, flash
 
-regex = re.compile(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+regex = re.compile(r"[^@]+@[^@]+")
 
 def is_sign_up_info_valid(user) -> bool:
     if user:

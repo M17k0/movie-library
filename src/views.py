@@ -5,7 +5,7 @@ from datetime import datetime
 
 from .tmdb_interface import search_movie, get_movie_by_id, get_tmdb_genres, get_movies_by_genre, get_reccomendations
 from .setup import db
-from .models import User, Watched, Watchlist, Genre, Movie, MovieGenre
+from .models import Watched, Watchlist, Genre, Movie, MovieGenre
 
 views = Blueprint("views", __name__, template_folder="../templates/")
 
@@ -28,7 +28,12 @@ def home():
     if request.method == "POST":
         movie_title = request.form.get("movie_title")
         if movie_title:
-            search_results = search_movie(movie_title)
+            try:
+                search_results = search_movie(movie_title)
+            except:
+                flash("TMDB API is down!", category="error")
+                return render_template("home.html", user=current_user)
+            
             return render_template("home.html", user=current_user, search_results=search_results)
         
     return render_template("home.html", user=current_user)
@@ -37,7 +42,11 @@ def home():
 @login_required
 def log(id):
     if request.method == "POST":
-        movie = get_movie_by_id(id)
+        try:
+            movie = get_movie_by_id(id)
+        except:
+            flash("TMDB API is down!", category="error")
+            return redirect(url_for("views.home"))
         
         db_genres = []
         for genre in movie.genres:
@@ -81,7 +90,12 @@ def log(id):
         
         return redirect(url_for("views.watched"))
     
-    movie = get_movie_by_id(id)
+    try:
+        movie = get_movie_by_id(id)
+    except:
+        flash("TMDB API is down!", category="error")
+        return redirect(url_for("views.home"))
+        
     return render_template("log.html", user=current_user, movie=movie)
 
 @views.route("/remove-log/<id>", methods=["POST"])
@@ -100,8 +114,12 @@ def remove_log(id):
 @views.route("/add-to-watchlist/<id>", methods=["POST"])
 @login_required
 def add_to_watchlist(id):
-    movie = get_movie_by_id(id)
-        
+    try:
+        movie = get_movie_by_id(id)
+    except:
+        flash("TMDB API is down!", category="error")
+        return redirect(url_for("views.home"))
+    
     db_genres = []
     for genre in movie.genres:
         db_genre = Genre.query.filter_by(tmdb_id=genre.id).first()
@@ -153,8 +171,7 @@ def add_to_watchlist(id):
 @views.route("/remove-watchlist/<id>", methods=["POST"])
 @login_required
 def remove_watchlsit(id):
-    db_watchlist = Watchlist.query.filter_by(id=id).first()
-    
+    db_watchlist = Watchlist.query.filter_by(id=id).first()    
     if not db_watchlist:
         abort(400)
     
@@ -166,7 +183,11 @@ def remove_watchlsit(id):
 @views.route("/discover", methods=["GET", "POST"])
 @login_required
 def discover():
-    genres = get_tmdb_genres()
+    try:
+        genres = get_tmdb_genres()
+    except:
+        flash("TMDB API is down!", category="error")
+        return redirect(url_for("views.home"))
     
     if request.method == "POST":
         genre_id = (request.form.get("genre_id") or "0")
@@ -179,6 +200,11 @@ def discover():
 @views.route("/similar/<id>")
 @login_required
 def similar(id):
-    similar_movies = get_reccomendations(id)
+    try:
+        similar_movies = get_reccomendations(id)
+    except:
+        flash("TMDB API is down!", category="error")
+        return redirect(url_for("views.home"))
+
     return render_template("similar.html", user=current_user, similar_movies=similar_movies)
     

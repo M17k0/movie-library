@@ -32,12 +32,15 @@ def search_movie(name, page=1) -> list[MovieModel]:
     url = tmdb_base_url + f"search/movie?query={quote(name)}&page={page}"
 
     response = requests.get(url, headers=get_tmdb_request_headers())
+    if response.status_code >= 300:
+        raise ValueError(f"Bad response - status code: {response.status_code}")
+    
     data = response.json()
     movies = [MovieModel(id=movie["id"],
                          title=movie["title"],
                          poster=tmdb_poster_url + movie["poster_path"],
                          release_date=movie["release_date"])
-              for movie in data["results"] 
+              for movie in data["results"]
               if movie["poster_path"] != None]
 
     return movies
@@ -46,6 +49,9 @@ def get_movie_by_id(movie_id: int) -> MovieModel:
     url = tmdb_base_url + f"movie/{movie_id}"
 
     response = requests.get(url, headers=get_tmdb_request_headers())
+    if response.status_code >= 300:
+        raise ValueError(f"Bad response - status code: {response.status_code}")
+    
     data = response.json()
 
     movie = MovieModel(id=data["id"],
@@ -59,10 +65,13 @@ def get_movie_by_id(movie_id: int) -> MovieModel:
 
     return movie
 
-def get_tmdb_genres():
+def get_tmdb_genres() -> list[GenreModel]:
     url = tmdb_base_url + "genre/movie/list"
     
     response = requests.get(url, headers=get_tmdb_request_headers())
+    if response.status_code >= 300:
+        raise ValueError(f"Bad response - status code: {response.status_code}")
+    
     data = response.json()
     
     all_genres = [GenreModel(id=genre["id"],
@@ -71,10 +80,13 @@ def get_tmdb_genres():
     
     return all_genres
     
-def get_reccomendations(movie_id: int):
+def get_reccomendations(movie_id: int) -> list[MovieModel]:
     url = tmdb_base_url + f"movie/{movie_id}/recommendations"
     
     response = requests.get(url, headers=get_tmdb_request_headers())
+    if response.status_code >= 300:
+        raise ValueError(f"Bad response - status code: {response.status_code}")
+    
     data = response.json()
     
     movies = [MovieModel(id=movie["id"],
@@ -86,10 +98,13 @@ def get_reccomendations(movie_id: int):
     
     return movies
 
-def get_movies_by_genre(genre: int):
+def get_movies_by_genre(genre: int) -> list[MovieModel]:
     url = tmdb_base_url + f"discover/movie?with_genres={genre}&sort_by=vote_average.desc&vote_count.gte=10000"
     
     response = requests.get(url, headers=get_tmdb_request_headers())
+    if response.status_code >= 300:
+        raise ValueError(f"Bad response - status code: {response.status_code}")
+    
     data = response.json()
     
     movies = [MovieModel(id=movie["id"],

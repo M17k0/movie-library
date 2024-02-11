@@ -1,6 +1,6 @@
 # Movie library
 
-Simple movie library project made with flask, mimicking some of letterboxd.com functionalities.
+Simple movie library project made with flask, mimicking some of [letterboxd](https://letterboxd.com/) functionalities.
 
 # Features
 - User authentication(register and login)

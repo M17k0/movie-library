@@ -1,5 +1,6 @@
 """
 Implements the integration with the TMDB API
+
 """
 import dotenv
 import os
@@ -37,105 +38,94 @@ def get_tmdb_request_headers() -> dict:
 
     return headers
 
+def fetch_tmdb_data(endpoint: str) -> dict:
+    """
+    Fetch data from TMDB endpoint and
+    return a dictionary representing the TMDB response.
+    """    
+    url = tmdb_base_url + endpoint
+    
+    response = requests.get(url, headers=get_tmdb_request_headers())
+    if response.status_code >= 300:
+        raise ValueError(f"Bad response - status code: {response.status_code}")
+    
+    return response.json()
+
+def create_movie_models(movies_data: list[dict]) -> list[MovieModel]:
+    """
+    Create MovieModel instances without genres from a list of dict of TMDB movies data("results")
+    Used to visualize the movies for search/recommend/discover requests
+    may also use the genres and just call create_full_movie_model()
+    """
+    return [MovieModel(id=movie["id"],
+                       title=movie["title"],
+                       poster=tmdb_poster_url + movie["poster_path"],
+                       release_date=movie["release_date"])
+            for movie in movies_data
+            if movie["poster_path"] is not None]
+
+def create_full_movie_model(movie_data: dict) -> MovieModel:
+    """
+    Create full MovieModel from a dict of TMDB data for a single movie
+    """
+    movie = MovieModel(id=movie_data["id"],
+                       title=movie_data["title"],
+                       poster = tmdb_poster_url + movie_data["poster_path"] 
+                                if movie_data["poster_path"] is not None 
+                                else tmdb_poster_url,
+                       release_date=movie_data["release_date"])
+    
+    movie.genres = [GenreModel(id=genre["id"],
+                               name=genre["name"])
+                    for genre in movie_data["genres"]]
+
+    return movie
+
 def search_movie(name, page=1) -> list[MovieModel]:
     """
     Get movies from TMDB by keywords
     """
-    url = tmdb_base_url + f"search/movie?query={quote(name)}&page={page}"
+    endpoint =  f"search/movie?query={quote(name)}&page={page}"
 
-    response = requests.get(url, headers=get_tmdb_request_headers())
-    if response.status_code >= 300:
-        raise ValueError(f"Bad response - status code: {response.status_code}")
-    
-    data = response.json()
-    movies = [MovieModel(id=movie["id"],
-                         title=movie["title"],
-                         poster=tmdb_poster_url + movie["poster_path"],
-                         release_date=movie["release_date"])
-              for movie in data["results"]
-              if movie["poster_path"] != None]
-
-    return movies
+    data = fetch_tmdb_data(endpoint)
+    return create_movie_models(data["results"])
 
 def get_movie_by_id(movie_id: int) -> MovieModel:
     """
-    Get movie from TMDB by TMDB id
+    Get movie from TMDB by it's TMDB id
     """
-    url = tmdb_base_url + f"movie/{movie_id}"
+    endpoint =  f"movie/{movie_id}"
 
-    response = requests.get(url, headers=get_tmdb_request_headers())
-    if response.status_code >= 300:
-        raise ValueError(f"Bad response - status code: {response.status_code}")
-    
-    data = response.json()
-
-    movie = MovieModel(id=data["id"],
-                       title=data["title"],
-                       poster=tmdb_poster_url + data["poster_path"],
-                       release_date=data["release_date"])
-    
-    movie.genres = [GenreModel(id=genre["id"],
-                               name=genre["name"])
-                    for genre in data["genres"]]
-
-    return movie
+    data = fetch_tmdb_data(endpoint)
+    return create_full_movie_model(data)
 
 def get_tmdb_genres() -> list[GenreModel]:
     """
     Get all available genres for movies from TMDB
     """
-    url = tmdb_base_url + "genre/movie/list"
+    endpoint =  "genre/movie/list"
     
-    response = requests.get(url, headers=get_tmdb_request_headers())
-    if response.status_code >= 300:
-        raise ValueError(f"Bad response - status code: {response.status_code}")
-    
-    data = response.json()
+    data = fetch_tmdb_data(endpoint)
     
     all_genres = [GenreModel(id=genre["id"],
                              name=genre["name"]) 
                   for genre in data["genres"]]
-    
     return all_genres
     
-def get_reccomendations(movie_id: int) -> list[MovieModel]:
+def get_recommendations(movie_id: int) -> list[MovieModel]:
     """
-    Get similar movies for TMDB movie id
+    Get similar movies from TMDB movie id
     """
-    url = tmdb_base_url + f"movie/{movie_id}/recommendations"
-    
-    response = requests.get(url, headers=get_tmdb_request_headers())
-    if response.status_code >= 300:
-        raise ValueError(f"Bad response - status code: {response.status_code}")
-    
-    data = response.json()
-    
-    movies = [MovieModel(id=movie["id"],
-                         title=movie["title"],
-                         poster=tmdb_poster_url + movie["poster_path"],
-                         release_date=movie["release_date"])
-              for movie in data["results"] 
-              if movie["poster_path"] != None]
-    
-    return movies
+    endpoint =  f"movie/{movie_id}/recommendations"
+
+    data = fetch_tmdb_data(endpoint)
+    return create_movie_models(data["results"])
 
 def get_movies_by_genre(genre: int) -> list[MovieModel]:
     """
-    Get best rated moviesby genre from TMDB
+    Get best rated movies by genre with >=10_000 votes from TMDB
     """
-    url = tmdb_base_url + f"discover/movie?with_genres={genre}&sort_by=vote_average.desc&vote_count.gte=10000"
+    endpoint = f"discover/movie?with_genres={genre}&sort_by=vote_average.desc&vote_count.gte=10000"
     
-    response = requests.get(url, headers=get_tmdb_request_headers())
-    if response.status_code >= 300:
-        raise ValueError(f"Bad response - status code: {response.status_code}")
-    
-    data = response.json()
-    
-    movies = [MovieModel(id=movie["id"],
-                         title=movie["title"],
-                         poster=tmdb_poster_url + movie["poster_path"],
-                         release_date=movie["release_date"])
-              for movie in data["results"]
-              if movie["poster_path"] != None]
-    
-    return movies
+    data = fetch_tmdb_data(endpoint)
+    return create_movie_models(data["results"])

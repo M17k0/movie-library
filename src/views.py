@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, current_app, request, redirect, ur
 from flask_login import current_user, login_required
 from datetime import datetime
 
-from .tmdb_interface import search_movie, get_movie_by_id, get_tmdb_genres, get_movies_by_genre, get_reccomendations
+from .tmdb_interface import search_movie, get_movie_by_id, get_tmdb_genres, get_movies_by_genre, get_recommendations
 from .setup import db
 from .models import Watched, Watchlist, Genre, Movie, MovieGenre
 
@@ -25,6 +25,7 @@ def watched():
                            watched_movies=watched_movies)
 
 @views.route("/watchlist")
+@login_required
 def watchlist():
     from .models import Watchlist
 
@@ -105,6 +106,13 @@ def log(id):
         db_watched.review = request.form.get("review")
         watched_date = datetime.strptime(request.form.get("date_watched") or "", "%Y-%m-%d") 
         db_watched.date_watched = watched_date
+        
+        # Check if movie is in watchilst and remove it from there
+        watchlist_movie = (Watchlist.query
+                           .filter_by(user_id=current_user.id, movie_id=db_movie.id)
+                           .first())
+        if watchlist_movie:
+            db.session.delete(watchlist_movie)
         
         db.session.add(db_watched)
         db.session.commit()
@@ -242,7 +250,7 @@ def discover():
 @login_required
 def similar(id):
     try:
-        similar_movies = get_reccomendations(id)
+        similar_movies = get_recommendations(id)
     except:
         flash("TMDB API is down!", category="error")
         return redirect(url_for("views.home"))

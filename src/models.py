@@ -4,7 +4,7 @@ Create SQLAlchemy database models
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
-from .setup import db
+from .setup_db import db
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

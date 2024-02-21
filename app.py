@@ -1,4 +1,4 @@
-from src.setup import create_app
+from src.setup_app import create_app
 
 app = create_app()
 

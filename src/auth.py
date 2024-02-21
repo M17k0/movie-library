@@ -6,13 +6,14 @@ from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, current_user, login_required
 
 from .validations import is_sign_up_info_valid, is_login_info_valid
+from .setup_db import db
+from .models import User
+
 
 auth = Blueprint("auth", __name__, template_folder="../templates")
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
-    from .models import User
-
     if request.method == "POST":
         email = request.form.get("email")
 
@@ -34,8 +35,6 @@ def logout():
 
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
-    from .models import User
-
     if request.method == "POST":
         data = request.form
         if not is_sign_up_info_valid((User.query
@@ -52,8 +51,6 @@ def sign_up():
         new_user = User()
         new_user.email = email
         new_user.password = password_hash
-
-        from .setup import db
 
         login_user(new_user, remember=True)
         db.session.add(new_user)

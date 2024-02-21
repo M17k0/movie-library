@@ -7,7 +7,7 @@ from flask_login import current_user, login_required
 from datetime import datetime
 
 from .tmdb_interface import search_movie, get_movie_by_id, get_tmdb_genres, get_movies_by_genre, get_recommendations
-from .setup import db
+from .setup_db import db
 from .models import Watched, Watchlist, Genre, Movie, MovieGenre
 
 views = Blueprint("views", __name__, template_folder="../templates/")
@@ -27,8 +27,6 @@ def watched():
 @views.route("/watchlist")
 @login_required
 def watchlist():
-    from .models import Watchlist
-
     watchlist = (Watchlist.query
                  .filter_by(user_id=current_user.id)
                  .order_by(Watchlist.id.desc())

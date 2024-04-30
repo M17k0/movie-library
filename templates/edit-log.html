@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Movie Log{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mt-4">
+    <div class="col">
+      <h1>Edit Movie Log</h1>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-4">
+      <div class="card">
+        <img src="{{ movie.movie.poster }}" class="card-img-top" alt="{{ movie.movie.title }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ movie.movie.title }}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <form action="/update-log/{{ movie.id }}" method="POST">
+        <div class="form-group">
+          <label for="review">Review:</label>
+          <textarea class="form-control" id="review" name="review" rows="4">{{ movie.review }}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="rating">Rating:</label>
+          <div class="rating">
+            {% set current_rating = movie.rating %}
+            {% for num in range(1, 11) %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="rating" value="{{ num }}" id="rating{{ num }}" {{ 'checked' if current_rating == num else '' }}>
+              <label class="form-check-label" for="rating{{ num }}">
+                {{ num }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="date-watched">Date Watched:</label>
+          <input type="date" class="form-control" id="date-watched" name="date_watched" value="{{ movie.date_watched.strftime('%Y-%m-%d') }}" required>
+        </div>
+        <button type="submit" the "btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

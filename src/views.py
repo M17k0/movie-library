@@ -127,6 +127,44 @@ def log(id):
                            user=current_user, 
                            movie=movie)
 
+@views.route("/edit-log/<id>", methods=["GET"])
+@login_required
+def edit_log(id):
+    movie_2 = (Watched.query
+             .filter_by(id=id)
+             .first())
+
+    return render_template("edit-log.html",
+                        user=current_user,
+                        movie=movie_2)    
+
+@views.route("/update-log/<id>", methods=["POST"])
+@login_required
+def update_log(id):
+    watched_movie = (Watched.query
+                        .filter_by(id=id)
+                        .first())
+    
+    if not watched_movie:
+        flash("Invalid log!", category="error")
+        return redirect(url_for("views.watched"))
+    
+    rating = request.form.get("rating")
+    review = request.form.get("review")
+    date_watched = request.form.get("date_watched")
+
+    if rating:
+        watched_movie.rating = int(rating)
+    if review:
+        watched_movie.review = review
+    if date_watched:
+        watched_movie.date_watched = datetime.strptime(date_watched, "%Y-%m-%d")
+
+    db.session.commit()
+    
+    # flash("Log updated successfully!", category="success")
+    return redirect(url_for("views.watched"))
+
 @views.route("/remove-log/<id>", methods=["POST"])
 @login_required
 def remove_log(id):

@@ -14,6 +14,6 @@ Simple movie library project made with flask, mimicking some of [letterboxd](htt
 # Instructions to run the application
 - Download the source code/clone the repository
 - Navigate to main project's directory
-- Create a virtual environment in the main directory `python -m venv .venv` and activate it (Optional)
+- Create a virtual environment in the main directory `python -m venv .venv` and activate it `.\venv\Scripts\Activate.ps1`(Optional)
 - Install dependencies. Run `pip install -r requirements.txt`
 - Run the application using `python app.py`
